@@ -1,0 +1,2 @@
+
+export const API_OPEN_BROWSER = 'API_OPEN_BROWSER'

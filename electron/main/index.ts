@@ -1,7 +1,10 @@
-import { app, BrowserWindow, shell, ipcMain } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, autoUpdater, dialog } from 'electron'
 import { release } from 'os'
 import { join } from 'path'
+import dotenv from 'dotenv'
 
+
+dotenv.config()
 // Disable GPU Acceleration for Windows 7
 if (release().startsWith('6.1')) app.disableHardwareAcceleration()
 
@@ -32,6 +35,8 @@ const indexHtml = join(ROOT_PATH.dist, 'index.html')
 async function createWindow() {
   win = new BrowserWindow({
     title: 'Main window',
+    width: 900,
+    height: 600,
     icon: join(ROOT_PATH.public, 'favicon.svg'),
     webPreferences: {
       preload,
@@ -44,7 +49,7 @@ async function createWindow() {
     win.loadFile(indexHtml)
   } else {
     win.loadURL(url)
-    // win.webContents.openDevTools()
+    win.webContents.openDevTools()
   }
 
   // Test actively push message to the Electron-Renderer
@@ -98,3 +103,6 @@ ipcMain.handle('open-win', (event, arg) => {
     // childWindow.webContents.openDevTools({ mode: "undocked", activate: true })
   }
 })
+
+import '../api'
+

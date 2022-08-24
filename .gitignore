@@ -12,6 +12,15 @@ dist
 dist-ssr
 *.local
 
+memory/
+browser/
+temp/
+extra/
+release/
+dist/
+.env
+tmp/
+
 # Editor directories and files
 .idea
 .DS_Store
