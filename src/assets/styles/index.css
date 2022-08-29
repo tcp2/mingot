@@ -5,6 +5,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
 }
 
 code {
@@ -16,3 +17,5 @@ code {
 .txt-edit .anticon:hover {
   cursor: pointer;
 }
+
+@primary-color: @blue-6;

@@ -1,10 +1,9 @@
 import { app, BrowserWindow, shell, ipcMain, autoUpdater, dialog } from 'electron'
 import { release } from 'os'
 import { join } from 'path'
-import dotenv from 'dotenv'
+import { loge } from '../lib/util';
 
 
-dotenv.config()
 // Disable GPU Acceleration for Windows 7
 if (release().startsWith('6.1')) app.disableHardwareAcceleration()
 
@@ -16,7 +15,6 @@ if (!app.requestSingleInstanceLock()) {
   process.exit(0)
 }
 
-process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 
 export const ROOT_PATH = {
   // /dist
@@ -45,8 +43,10 @@ async function createWindow() {
     },
   })
 
+
   if (app.isPackaged) {
     win.loadFile(indexHtml)
+    // win.webContents.openDevTools()
   } else {
     win.loadURL(url)
     win.webContents.openDevTools()
@@ -105,4 +105,5 @@ ipcMain.handle('open-win', (event, arg) => {
 })
 
 import '../api'
+
 

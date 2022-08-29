@@ -1,12 +1,13 @@
 
 
 export interface ProfileType {
-  isRun?: boolean
-  pref: string
-  id: string
-  userDataDir: string
-  name: string
-  ws?: string
+  prefFile: string,
+  id: string,
+  profilePath: string,
+  name: string,
+  ws?: string,
+  lastRun?: string,
   proxy?: any
-  prefJson?: any
+  createdAt?: string
 }
+

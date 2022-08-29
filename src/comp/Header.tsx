@@ -1,22 +1,45 @@
-import { WifiOutlined, DisconnectOutlined } from "@ant-design/icons";
-import { Row, Col, Space, Layout, Select } from "antd";
+import {
+  DisconnectOutlined,
+  SyncOutlined,
+} from "@ant-design/icons";
+import { Row, Col, Space, Layout, Select, Button } from "antd";
 import { useEffect, useState } from "react";
+import { ipcRenderer as ip } from "electron";
 
-const { Header, Content, Footer } = Layout;
+const { Header } = Layout;
 const { Option } = Select;
+const IP_CHECKER_URL = "http://www.geoplugin.net/json.gp";
 
-export interface IpInfo {
-  ip: string;
-  country: string;
+interface IpInfo {
+  geoplugin_request: string;
+  geoplugin_delay: string;
+  geoplugin_countryCode: string;
 }
 
 export const HeaderBar = () => {
   const [ipStatus, setIpStatus] = useState({});
   const [ipInfo, setIpInfo] = useState<IpInfo>();
+  const [loading, setLoading] = useState(false);
+
+
+  useEffect(() => {
+    checkIpInfo()
+  }, [])
 
   const updateOnlineStatus = async () => {
     let status = navigator.onLine ? 1 : 0;
     setIpStatus(status);
+  };
+
+  const checkIpInfo = async () => {
+    setLoading(true);
+    try {
+      let res = await fetch(IP_CHECKER_URL);
+      setIpInfo(await res.json());
+    } catch (e) {
+    } finally {
+      setTimeout(() => setLoading(false), 1000)
+    }
   };
 
   useEffect(() => {
@@ -27,19 +50,23 @@ export const HeaderBar = () => {
   return (
     <Header style={{ color: "#fff" }}>
       <Row justify="space-between">
-        <Col></Col>
         <Col>
           <h1 style={{ color: "#fff" }}>BÓNG MA</h1>
         </Col>
         <Col>
           <Space>
             {ipStatus ? (
-              <>
-                <WifiOutlined style={{ color: "green" }} />
-                <span>IP: {ipInfo?.ip}</span>
-                <span>|</span>
-                <span>{ipInfo?.country}</span>
-              </>
+              <Space>
+                <SyncOutlined
+                  spin={loading}
+                  onClick={checkIpInfo}
+                />
+                <Space split="|">
+                  <span>IP: {ipInfo?.geoplugin_request}</span>
+                  <span>{ipInfo?.geoplugin_countryCode}</span>
+                  <span>{ipInfo?.geoplugin_delay}</span>
+                </Space>
+              </Space>
             ) : (
               <>
                 <DisconnectOutlined />

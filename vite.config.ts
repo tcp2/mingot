@@ -13,6 +13,13 @@ rmSync(path.join(__dirname, 'dist'), { recursive: true, force: true }) // v14.14
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  css: {
+    preprocessorOptions: {
+      less: {
+        javascriptEnabled: true,
+      },
+    },
+  },
   resolve: {
     alias: {
       '@': path.join(__dirname, 'src'),
