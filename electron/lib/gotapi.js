@@ -11,7 +11,7 @@ const decompressUnzip = require("decompress-unzip");
 const path = require("path");
 const axios = require("axios");
 const https = require("https");
-import {copy} from 'fs-extra'
+import { copy } from "fs-extra";
 const OS_PLATFORM = process.platform;
 const HOMEDIR = os.homedir();
 import { existsSync } from "fs";
@@ -174,7 +174,7 @@ class GotApi {
 
     let res = null;
     let data;
-    if (proxy !== null && proxy.mode !== "none") {
+    if (proxy !== null && proxy.mode !== "none" && proxy?.host) {
       if (proxy.mode.includes("socks")) {
         for (let i = 0; i < 5; i++) {
           try {
@@ -188,23 +188,23 @@ class GotApi {
         throw new Error(`Socks proxy connection timed out`);
       }
       const proxyUrl = `${proxy.mode}://${proxy.username}:${proxy.password}@${proxy.host}:${proxy.port}`;
-      dd("getTimeZone start https://time.gologin.com/timezone", proxyUrl);
-      data = await requests.get("https://time.gologin.com/timezone", {
+      dd("getTimeZone start http://lumtest.com/myip.json", proxyUrl);
+      data = await requests.get("http://lumtest.com/myip.json", {
         proxy: proxyUrl,
         timeout: 20 * 1000,
         maxAttempts: 5,
       });
     } else {
-      data = await requests.get("https://time.gologin.com/timezone", {
+      data = await requests.get("http://lumtest.com/myip.json", {
         timeout: 20 * 1000,
         maxAttempts: 5,
       });
     }
+    let rs = JSON.parse(data.body);
+    dd("getTimeZone finish", rs);
 
-    dd("getTimeZone finish", data.body);
-    this._tz = JSON.parse(data.body);
 
-    return this._tz.timezone;
+    return rs;
   }
 
   getGeolocationParams(profileGeolocationParams, tzGeolocationParams) {
@@ -284,13 +284,10 @@ class GotApi {
   }
 
   async parseLocation(profile, proxy) {
-    let timezone = await this.fetchTimeZone(proxy).catch((e) => {
-      console.error("Proxy Error. Check it and try again.");
-      throw e;
-    });
+    let loc = await this.fetchTimeZone(proxy)
 
-    const [latitude, longitude] = this._tz.ll;
-    const accuracy = this._tz.accuracy;
+    const {latitude, longitude} = loc.geo;
+    const accuracy = 100;
 
     const profileGeolocation = profile.geolocation;
     const tzGeoLocation = {
@@ -303,13 +300,14 @@ class GotApi {
       tzGeoLocation
     );
 
+    profile.timezone = { id: loc.geo.tz };
     profile.webRtc = {
       mode:
         _.get(profile, "webRTC.mode") === "alerted"
           ? "public"
           : _.get(profile, "webRTC.mode"),
       publicIP: _.get(profile, "webRTC.fillBasedOnIp")
-        ? this._tz.ip
+        ? loc.ip
         : _.get(profile, "webRTC.publicIp"),
       localIps: _.get(profile, "webRTC.localIps", []),
     };
@@ -324,11 +322,7 @@ class GotApi {
   async parseHardware(profile) {
     const audioContext = profile.audioContext || {};
     const { mode: audioCtxMode = "off", noise: audioCtxNoise } = audioContext;
-    if (profile.timezone.fillBasedOnIp == false) {
-      profile.timezone = { id: profile.timezone.timezone };
-    } else {
-      profile.timezone = { id: this._tz.timezone };
-    }
+
     profile.webgl_noise_value = profile.webGL.noise;
     profile.get_client_rects_noise = profile.webGL.getClientRectsNoise;
     profile.canvasMode = profile.canvas.mode;
@@ -554,11 +548,12 @@ class GotApi {
       remote_debugging_port = await this.getRandomPort();
     }
 
-    let proxy = _.get("proxy");
+    let proxy = _.get(gologin, "proxy");
     let proxy_host = "";
-    if (proxy) {
+    let proxy_raw = null
+    if (proxy && proxy?.host) {
       proxy_host = proxy.host;
-      proxy = `${proxy.mode}://${proxy.host}:${proxy.port}`;
+      proxy_raw = `${proxy.mode}://${proxy.host}:${proxy.port}`;
     }
 
     this.port = remote_debugging_port;
@@ -571,11 +566,11 @@ class GotApi {
     Object.keys(process.env).forEach((key) => {
       env[key] = process.env[key];
     });
-    const tz = await this.fetchTimeZone(this.proxy).catch((e) => {
+    const loc = await this.fetchTimeZone(proxy).catch((e) => {
       console.error("Proxy Error. Check it and try again.");
       throw e;
     });
-    env["TZ"] = tz;
+    env["TZ"] = loc.geo.tz;
 
     let language = gologin?.navigator?.language || "en-US,en;q=0.9";
     const [splittedLangs] = language.split(";");
@@ -588,7 +583,6 @@ class GotApi {
       `--remote-debugging-port=${remote_debugging_port}`,
       `--user-data-dir=${profilePath}`,
       `--password-store=basic`,
-      `--tz=${tz}`,
       `--lang=${browserLang}`,
     ];
 
@@ -604,9 +598,9 @@ class GotApi {
       params.push(arg);
     }
 
-    if (proxy) {
+    if (proxy_raw) {
       const hr_rules = `"MAP * 0.0.0.0 , EXCLUDE ${proxy_host}"`;
-      params.push(`--proxy-server=${proxy}`);
+      params.push(`--proxy-server=${proxy_raw}`);
       params.push(`--host-resolver-rules=${hr_rules}`);
     }
 
@@ -684,8 +678,8 @@ class GotApi {
   }
 
   async copyProfile(src) {
-    let name = path.basename(src)
-    let dst = path.join(PROFILE_PATH,name)
+    let name = path.basename(src);
+    let dst = path.join(PROFILE_PATH, name);
     await copy(src, dst);
   }
 
@@ -696,7 +690,7 @@ class GotApi {
       await access(pref_file);
       return Promise.resolve(true);
     } catch (err) {
-      loge(err)
+      loge(err);
     }
 
     return Promise.resolve(false);

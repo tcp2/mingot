@@ -145,7 +145,7 @@ const Home = ({setLoading}: {setLoading: Function}) => {
   };
 
   const dispProxy = (e: ProfileType) => {
-    if (!e?.proxy) return "-";
+    if (_.isEmpty(e?.proxy) || _.isEmpty(e?.proxy.host)) return "-";
 
     if (["socks5", "socks4", 'http'].includes(e.proxy.mode)) {
       return `${e.proxy.mode}://${e.proxy.host}`;

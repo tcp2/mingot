@@ -49,7 +49,7 @@ async function createWindow() {
     // win.webContents.openDevTools()
   } else {
     win.loadURL(url)
-    win.webContents.openDevTools()
+    // win.webContents.openDevTools()
   }
 
   // Test actively push message to the Electron-Renderer
