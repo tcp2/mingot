@@ -620,6 +620,7 @@ class GotApi {
 
     // dd("SPAWN CMD", ORBITA_BROWSER, params.join(" "));
     gologin.lastRun = dayjs().format();
+    gologin.timezone.id = loc.geo.tz
 
     let new_ct = _.merge(pref_json, { gologin });
     let pref_file = this.getPrefFile(profilePath);
