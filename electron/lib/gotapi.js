@@ -392,6 +392,8 @@ class GotApi {
 
   async createBookmark(profilePath) {
     let src = path.join(EXTRA_PATH, "Bookmarks");
+    if(!existsSync(src)) return
+
     let dst = path.join(profilePath, "Default", "Bookmarks");
     await cp(src, dst);
     return Promise.resolve();
