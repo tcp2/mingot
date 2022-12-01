@@ -55,8 +55,8 @@ const Home = ({ setLoading }: { setLoading: Function }) => {
     let data: Array<ProfileType> = await ip.invoke("load-profile");
     data = _.orderBy(
       data,
-      [({ createdAt }) => createdAt || "", "name"],
-      ["asc", "asc"]
+      [({ createdAt }) => createdAt || "", "lastRun"],
+      ["desc", "desc"]
     );
 
     setBrowsers(data);

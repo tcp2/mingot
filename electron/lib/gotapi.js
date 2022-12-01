@@ -52,7 +52,7 @@ export function unpack(s) {
 }
 
 const token =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MmZlNTU1NzQwOTkxYjhlNDMyNDJiMDkiLCJ0eXBlIjoiZGV2Iiwiand0aWQiOiI2MzA1NmUxMjRkMTczOTJlZGEyYjVlMDMifQ.BPh0QdZ1_h96zleV_-kpZP7XCJCiC3AjSQUQy-XhQSE";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqd3RpZCI6IjYzNmY2ODQ0N2NmZTFiMmM0MTlmMmJiMSIsInR5cGUiOiJ1c2VyIiwic3ViIjoiNjJmZTU1NTc0MDk5MWI4ZTQzMjQyYjA5In0.Cwp6SlqGeaOkQ--HrLOA4Mfu-T4q1VciWFRJfQlclsk";
 
 const GOL_API = "https://api.gologin.com";
 
