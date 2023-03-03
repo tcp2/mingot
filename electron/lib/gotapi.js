@@ -585,6 +585,7 @@ class GotApi {
       `--remote-debugging-port=${remote_debugging_port}`,
       `--user-data-dir=${profilePath}`,
       `--password-store=basic`,
+      '--disable-web-security',
       `--lang=${browserLang}`,
     ];
 
@@ -612,7 +613,6 @@ class GotApi {
     params.push("--disable-encryption");
 
     dd(params);
-
     const child = await spawn(ORBITA_BROWSER, params, {
       env,
       detached: process.platform !== "win32",

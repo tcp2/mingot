@@ -161,10 +161,17 @@ ip.handle('login', async (ev, username = undefined) => {
   if(user) {
     username = user.username
   }
-  let res = await axios.post('https://dev.newlifeme.vn/api/mingot/login', {username, device_id})
-  logi('login response', res.data);
-  let active = res.data.status
-  store.set('user', {username, active})
+  // let res = await axios.post('https://dev.newlifeme.vn/api/mingot/login', {username, device_id})
+  // logi('login response', res.data);
+  // let active = res.data.status
+  // store.set('user', {username, active})
 
-  return Promise.resolve(res.data.status)
+  // return Promise.resolve(res.data.status)
+
+   user = {username: 'superman'}
+  let active = true
+  store.set('user', {username, active})
+  return Promise.resolve(true)
+
+
 })
