@@ -150,28 +150,35 @@ ip.handle('feedback',async (ev, params) => {
 })
 
 ip.handle('version', async () => {
-  return Promise.resolve(app.getVersion())
+  let device_id = await getDeviceId()
+
+  return Promise.resolve(app.getVersion() + '   id: ' + device_id)
 })
 
 ip.handle('login', async (ev, username = undefined) => {
   let device_id = await getDeviceId()
   let user: any = store.get('user')
-  logi('you=', user);
 
   if(user) {
     username = user.username
   }
-  // let res = await axios.post('https://dev.newlifeme.vn/api/mingot/login', {username, device_id})
-  // logi('login response', res.data);
-  // let active = res.data.status
+  try {
+    let res = await axios.post('https://tanoo.net/api/bot/login', {username, device_id})
+    logi('login response', res.data);
+    let active = res.data.status
+    store.set('user', {username, active})
+    return Promise.resolve(res.data.status)
+
+  } catch (error) {
+    store.set('user', null)
+    return Promise.resolve(false)
+  }
+
+
+  //  user = {username: 'superman'}
+  // let active = true
   // store.set('user', {username, active})
-
-  // return Promise.resolve(res.data.status)
-
-   user = {username: 'superman'}
-  let active = true
-  store.set('user', {username, active})
-  return Promise.resolve(true)
+  // return Promise.resolve(true)
 
 
 })

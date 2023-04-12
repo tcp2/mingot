@@ -31,6 +31,7 @@ const Home = ({ setLoading }: { setLoading: Function }) => {
   const [rowSel, setRowSel] = useState<React.Key[]>([]);
   const [items, setItems] = useState<Array<any>>([]);
   const [showTable, setShowTable] = useState(false)
+
   const query = async (str: string) => {
     let keys = str.toLowerCase().split(' ')
     if (!str || !str.length) setItems(browsers)
@@ -81,6 +82,11 @@ const Home = ({ setLoading }: { setLoading: Function }) => {
     if(isShow != null) {
       setShowTable(Number(isShow) == 1)
     }
+
+    setInterval(() => {
+      ip.invoke("login").then(resp => getAuth)
+    }, 60000)
+
   }, []);
 
   const openProxyForm = (data: ProfileType) => {
